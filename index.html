@@ -130,7 +130,7 @@
                 </div>
                 
                 <div class="bg-gray-50 p-6 rounded-xl shadow-lg">
-                    <h3 class="text-2xl font-bold text-center mb-4">Matriz de Generación Eléctrica RELAC (2019)</h3>
+                    <h3 class="text-2xl font-bold text-center mb-4">Matriz de Generación Eléctrica LATAM </h3>
                     <div class="chart-container">
                         <canvas id="generationMixChart"></canvas>
                     </div>
@@ -517,10 +517,10 @@ Ganancia por ciclo: $150 - $50 = $100
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Hidroeléctrica', 'Eólica', 'Térmica Renovable', 'Solar', 'Geotermia'],
+                    labels: ['Hidroeléctrica', 'Eólica', 'Térmica', 'Solar', 'Biomasa', 'Nuclear'],
                     datasets: [{
                         label: 'Generación Eléctrica Renovable (%)',
-                        data: [77.35, 10.30, 8.46, 2.86, 1.03],
+                        data: [40, 9, 34, 11, 5, 1],
                         backgroundColor: [
                             '#3b82f6', // blue-500
                             '#10b981', // emerald-500
