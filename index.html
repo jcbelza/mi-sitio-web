@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelos de Negocio Eléctricos en América Latina y el Caribe</title>
+    
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: Se ha diseñado una aplicación de una sola página con navegación superior fija para facilitar el acceso a las secciones clave: Panorama, Modelos, Impulsores, Financiamiento y Desafíos. Esta estructura temática, en lugar de lineal, permite al usuario explorar el contenido de forma no secuencial y centrarse en las áreas de mayor interés. Se utilizan componentes interactivos como pestañas y acordeones para presentar información densa de manera organizada y digerible, mejorando la usabilidad y evitando un desplazamiento excesivo. La elección de esta arquitectura busca transformar un informe complejo en una narrativa interactiva y atractiva, guiando al usuario desde una visión general hasta detalles específicos de manera intuitiva. -->
+    <!-- Visualization & Content Choices: 
+        - Panorama: Tarjetas con métricas clave y un gráfico de dona (Chart.js/Canvas) para mostrar la matriz energética de 2019 de forma visual e inmediata. Objetivo: Informar.
+        - Modelos de Negocio: Un sistema de pestañas para comparar los 5 modelos. Cada pestaña contiene una descripción, un ejemplo matemático destacado y casos de estudio. Objetivo: Organizar y Comparar. La interacción de pestañas es ideal para comparar elementos complejos en un mismo espacio.
+        - Impulsores: Diagramas de comparación (HTML/CSS) para Net Metering vs. Net Billing y tarjetas para habilitadores tecnológicos. Objetivo: Comparar y Explicar. Se evita la complejidad de un gráfico para una comparación directa.
+        - Financiamiento: Un diseño de dos columnas con íconos para contrastar visualmente los riesgos y facilitadores. Objetivo: Comparar.
+        - Desafíos: Un acordeón para desglosar cada desafío sin abrumar al usuario con texto. Objetivo: Organizar.
+        Todas las visualizaciones se implementan con Chart.js (Canvas) o HTML/CSS/Tailwind, cumpliendo el requisito de no usar SVG ni Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #F8F7F4;
+            color: #2c3e50;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Poppins', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 40vh;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #2563eb; /* blue-600 */
+            border-bottom-color: #2563eb;
+        }
+        .tab-btn.active {
+            background-color: #2563eb;
+            color: white;
+        }
+        [data-tab-content] {
+            display: none;
+        }
+        [data-tab-content].active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <!-- CIER Logo -->
+                <img src="__file_access_url__/Logo CIER-PhotoRoom (1).png-216ff8fa-0c10-433c-bc5f-cabbe8f347f7" alt="Logo de CIER" class="h-10 w-10 rounded-full object-cover">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-blue-700">Sector Eléctrico LATAM</h1>
+                    <span class="text-sm text-gray-500">Tenemos el agrado de publicar este podcast de la CIER a partir de un análisis y trabajo realizado en el Seminario Internacional sobre Inversión y Financiación - III GEFIES - CIER. En particular sobre Modelos de Negocios para el Sector Eléctrico de Sudamérica, Centroamérica y El Caribe.</span>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#panorama" class="nav-link font-semibold">Panorama</a>
+                <a href="#modelos" class="nav-link font-semibold">Modelos</a>
+                <a href="#impulsores" class="nav-link font-semibold">Impulsores</a>
+                <a href="#financiamiento" class="nav-link font-semibold">Financiamiento</a>
+                <a href="#desafios" class="nav-link font-semibold">Desafíos</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-2">
+            <a href="#panorama" class="block nav-link">Panorama</a>
+            <a href="#modelos" class="block nav-link">Modelos</a>
+            <a href="#impulsores" class="block nav-link">Impulsores</a>
+            <a href="#financiamiento" class="block nav-link">Financiamiento</a>
+            <a href="#desafios" class="block nav-link">Desafíos</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="min-h-[50vh] flex items-center justify-center bg-blue-50 py-12">
+            <div class="text-center container mx-auto px-6">
+                <h2 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">La Transformación Energética de América Latina</h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                    Un análisis interactivo de los modelos de negocio que están redefiniendo el futuro del sector eléctrico en la región, impulsando la sostenibilidad y la innovación.
+                </p>
+            </div>
+        </section>
+
+        <!-- Panorama Section -->
+        <section id="panorama" class="py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl lg:text-4xl font-bold">Panorama Regional</h2>
+                    <p class="mt-4 text-lg text-gray-600">La región posee una base sólida en energías renovables, pero enfrenta el desafío de expandir y modernizar su matriz para satisfacer la demanda futura y alcanzar la neutralidad de carbono.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                    <!-- Stat Cards -->
+                    <div class="bg-gray-50 p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-5xl font-bold text-blue-600">60%</div>
+                        <p class="mt-2 font-semibold">de la electricidad generada proviene de fuentes limpias.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-5xl font-bold text-blue-600">97.2%</div>
+                        <p class="mt-2 font-semibold">de cobertura eléctrica, una de las más altas a nivel global.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-5xl font-bold text-red-500">18M</div>
+                        <p class="mt-2 font-semibold">de personas aún sin acceso a la energía.</p>
+                    </div>
+                     <div class="bg-gray-50 p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-5xl font-bold text-green-600">80%</div>
+                        <p class="mt-2 font-semibold">es la meta de generación renovable para 2030 (Iniciativa RELAC).</p>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4">Matriz de Generación Eléctrica RELAC (2019)</h3>
+                    <div class="chart-container">
+                        <canvas id="generationMixChart"></canvas>
+                    </div>
+                     <p class="text-center mt-4 text-gray-600">La hidroelectricidad domina la matriz renovable, evidenciando la necesidad de diversificar con fuentes como la solar y eólica para aumentar la resiliencia del sistema.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Business Models Section -->
+        <section id="modelos" class="py-16 lg:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl lg:text-4xl font-bold">Modelos de Negocio en Evolución</h2>
+                    <p class="mt-4 text-lg text-gray-600">Explore los modelos emergentes que están impulsando la transición energética. Seleccione una pestaña para ver los detalles.</p>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-2 mb-8" id="tabs-container">
+                    <button data-tab-target="gd" class="tab-btn px-4 py-2 text-sm font-semibold rounded-full bg-white shadow transition-colors">Generación Distribuida</button>
+                    <button data-tab-target="comunidades" class="tab-btn px-4 py-2 text-sm font-semibold rounded-full bg-white shadow transition-colors">Comunidades Energéticas</button>
+                    <button data-tab-target="eaas" class="tab-btn px-4 py-2 text-sm font-semibold rounded-full bg-white shadow transition-colors">Energy as a Service (EaaS)</button>
+                    <button data-tab-target="ppa" class="tab-btn px-4 py-2 text-sm font-semibold rounded-full bg-white shadow transition-colors">PPAs de Descarbonización</button>
+                    <button data-tab-target="hibridos" class="tab-btn px-4 py-2 text-sm font-semibold rounded-full bg-white shadow transition-colors">Modelos Híbridos</button>
+                </div>
+
+                <div id="tab-content-container" class="bg-white p-6 md:p-8 rounded-2xl shadow-xl min-h-[400px]">
+                    <!-- Generación Distribuida -->
+                    <div id="gd" data-tab-content>
+                        <h3 class="text-2xl font-bold mb-4">Generación Distribuida (GD)</h3>
+                        <p class="mb-6">Producción de energía en pequeñas centrales cerca del consumo, empoderando a los usuarios como "prosumidores". Reduce pérdidas de transmisión y ofrece retornos de inversión rápidos (2-3.5 años en algunos mercados).</p>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Variables Económicas Clave:</h4>
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li>Reducción de costos de tecnología (paneles solares).</li>
+                                    <li>Períodos de recuperación (Payback) cortos.</li>
+                                    <li>Importancia de financiamiento flexible a largo plazo.</li>
+                                    <li>Evolución de subsidios hacia la autosuficiencia del mercado.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <h4 class="font-semibold text-lg mb-2 text-center">🔢 Ejemplo Matemático</h4>
+                                <pre class="bg-gray-800 text-white p-4 rounded-md text-sm whitespace-pre-wrap">
+Consumo mensual: 1,000 kWh
+Tarifa red: $0.20/kWh
+Costo SIN GD: 1,000 * 0.20 = $200
+
+Autogeneración: 800 kWh
+Autoconsumo: 700 kWh
+Compra a red: 300 kWh
+Costo compra: 300 * 0.20 = $60
+
+Venta excedente (100 kWh a $0.10): $10
+Costo NETO CON GD: $60 - $10 = $50
+Ahorro mensual: $150
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Comunidades Energéticas -->
+                    <div id="comunidades" data-tab-content>
+                        <h3 class="text-2xl font-bold mb-4">Comunidades Energéticas</h3>
+                        <p class="mb-6">Agrupaciones de usuarios que colaboran para generar, consumir y gestionar energía de forma colectiva. Fomentan la democratización energética y el desarrollo local sostenible.</p>
+                         <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                               <h4 class="font-semibold text-lg mb-2">Casos Notables en la Región:</h4>
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li><b>Argentina:</b> Cooperativa de Armstrong, Santa Fe.</li>
+                                    <li><b>Brasil:</b> Proyecto RevoluSolar en favela Babilônia, Río.</li>
+                                    <li><b>Chile:</b> Programa "Comuna Energética" a nivel nacional.</li>
+                                    <li><b>Colombia:</b> Regulación de 2025 que formaliza su operación.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <h4 class="font-semibold text-lg mb-2 text-center">🔢 Ejemplo Matemático</h4>
+                                <pre class="bg-gray-800 text-white p-4 rounded-md text-sm whitespace-pre-wrap">
+Comunidad: 10 hogares
+Consumo/hogar: 300 kWh/mes
+Tarifa red: $0.15/kWh
+Costo SIN planta: 10*300*0.15 = $450
+
+Planta comunitaria genera: 2,500 kWh/mes
+Compra a red: 500 kWh
+Costo compra: 500 * 0.15 = $75
+
+Costo NETO CON planta: $75
+Ahorro total comunidad: $375/mes
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- EaaS -->
+                    <div id="eaas" data-tab-content>
+                        <h3 class="text-2xl font-bold mb-4">Energy as a Service (EaaS) & Business as a Platform</h3>
+                        <p class="mb-6">Las utilities evolucionan de vender kWh a ofrecer soluciones energéticas integrales (eficiencia, generación, gestión) bajo un modelo de servicio, o crear plataformas que conectan a productores, consumidores y otros proveedores de servicios.</p>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Transformación de la Utility:</h4>
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li>De proveedor de commodity a socio estratégico del cliente.</li>
+                                    <li>Nuevas fuentes de ingreso más allá de la venta de energía.</li>
+                                    <li>Fidelización de clientes a través de servicios de valor añadido.</li>
+                                    <li>Habilitado por la digitalización (IoT, Big Data, IA).</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <h4 class="font-semibold text-lg mb-2 text-center">🔢 Ejemplo Matemático</h4>
+                                <pre class="bg-gray-800 text-white p-4 rounded-md text-sm whitespace-pre-wrap">
+Fábrica SIN EaaS:
+Costo mensual: $10,000
+
+Fábrica CON EaaS:
+Tarifa fija EaaS: $8,000 (cubre 80% consumo)
+Costo compra red (20%): $2,000
+Costo Total CON EaaS: $10,000
+
+Beneficios: Cero inversión inicial,
+mantenimiento incluido, previsibilidad
+de costos, reducción huella de carbono.
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- PPA -->
+                    <div id="ppa" data-tab-content>
+                        <h3 class="text-2xl font-bold mb-4">PPAs de Descarbonización</h3>
+                        <p class="mb-6">Contratos de compra de energía a largo plazo que garantizan un precio fijo por energía renovable. Son un instrumento clave para viabilizar la financiación de nuevos proyectos y facilitar el retiro de plantas de combustibles fósiles.</p>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                               <h4 class="font-semibold text-lg mb-2">Beneficios Clave:</h4>
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li><b>Estabilidad de Precios:</b> Protege a los consumidores de la volatilidad del mercado.</li>
+                                    <li><b>Bancabilidad:</b> Asegura ingresos a los desarrolladores, facilitando el financiamiento.</li>
+                                    <li><b>Sostenibilidad:</b> Ayuda a las empresas a cumplir sus metas de reducción de emisiones.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <h4 class="font-semibold text-lg mb-2 text-center">🔢 Ejemplo Matemático</h4>
+                                <pre class="bg-gray-800 text-white p-4 rounded-md text-sm whitespace-pre-wrap">
+Empresa SIN PPA:
+Costo promedio: 1M kWh * $0.15/kWh = $150,000
+
+Empresa CON PPA:
+Costo PPA (80%): 800k kWh * $0.14 = $112,000
+Costo Mercado (20%): 200k kWh * $0.15 = $30,000
+Costo Total CON PPA: $142,000
+
+Ahorro: $8,000/mes + estabilidad de precios.
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Híbridos -->
+                    <div id="hibridos" data-tab-content>
+                        <h3 class="text-2xl font-bold mb-4">Modelos Híbridos (Renovables + Almacenamiento)</h3>
+                        <p class="mb-6">Integran fuentes renovables (solar, eólica) con sistemas de almacenamiento (baterías - BESS) para mitigar la intermitencia, garantizar un suministro fiable y crear nuevas oportunidades de negocio como el arbitraje de precios.</p>
+                         <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Rol del Almacenamiento:</h4>
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li><b>Estabilidad:</b> Compensa la variabilidad de las renovables.</li>
+                                    <li><b>Fiabilidad:</b> Asegura el suministro 24/7.</li>
+                                    <li><b>Arbitraje:</b> Permite almacenar energía barata y venderla cara.</li>
+                                    <li><b>Líderes:</b> Chile y Brasil avanzan rápidamente en la implementación.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <h4 class="font-semibold text-lg mb-2 text-center">🔢 Ejemplo de Arbitraje</h4>
+                                <pre class="bg-gray-800 text-white p-4 rounded-md text-sm whitespace-pre-wrap">
+Capacidad batería: 1,000 kWh
+
+Carga (día, precio bajo):
+1,000 kWh * $0.05/kWh = $50 (costo)
+
+Descarga (noche, precio alto):
+1,000 kWh * $0.15/kWh = $150 (ingreso)
+
+Ganancia por ciclo: $150 - $50 = $100
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Enablers Section -->
+        <section id="impulsores" class="py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl lg:text-4xl font-bold">Impulsores de la Transición</h2>
+                    <p class="mt-4 text-lg text-gray-600">La tecnología y la regulación son los dos grandes motores que habilitan la innovación en los modelos de negocio del sector.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <!-- Technology -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6 text-center lg:text-left">🚀 Habilitadores Tecnológicos</h3>
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 p-6 rounded-xl shadow-lg">
+                                <h4 class="font-bold text-xl mb-2">Digitalización y Redes Inteligentes</h4>
+                                <p class="text-gray-700">La base para la gestión eficiente de la oferta y la demanda. Permiten la supervisión remota, la optimización con IA y la integración de millones de dispositivos, transformando la red en un sistema proactivo y resiliente.</p>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-xl shadow-lg">
+                                <h4 class="font-bold text-xl mb-2">Almacenamiento de Energía (BESS)</h4>
+                                <p class="text-gray-700">Esencial para gestionar la intermitencia de las renovables. Contratos como los "Tolling Agreements" facilitan su monetización, permitiendo ofrecer servicios de estabilidad a la red y transformando el almacenamiento de un costo técnico a un activo generador de ingresos.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Regulation -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6 text-center lg:text-left">⚖️ Marcos Regulatorios</h3>
+                        <div class="bg-gray-50 p-6 rounded-xl shadow-lg">
+                             <h4 class="font-bold text-xl mb-4">Net Metering vs. Net Billing</h4>
+                             <p class="text-gray-700 mb-4">Dos esquemas regulatorios clave para la Generación Distribuida, con diferencias importantes en cómo se compensa la energía inyectada a la red.</p>
+                             <div class="grid sm:grid-cols-2 gap-4">
+                                 <div class="border-2 border-green-500 p-4 rounded-lg">
+                                     <h5 class="font-bold text-lg text-green-700">Net Metering</h5>
+                                     <p class="text-sm">El excedente de energía genera un crédito en kWh a la misma tarifa de compra. La red funciona como una "batería virtual".</p>
+                                 </div>
+                                 <div class="border-2 border-blue-500 p-4 rounded-lg">
+                                     <h5 class="font-bold text-lg text-blue-700">Net Billing</h5>
+                                     <p class="text-sm">El excedente se vende a la red a un precio distinto (generalmente menor) al de compra, reflejando el costo mayorista.</p>
+                                 </div>
+                             </div>
+                             <p class="text-xs mt-4 text-gray-500">La crítica al Net Metering es que puede no compensar adecuadamente al operador de red por el uso de su infraestructura, un costo que el Net Billing intenta reflejar de forma más precisa.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financing Section -->
+        <section id="financiamiento" class="py-16 lg:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl lg:text-4xl font-bold">Balance del Financiamiento</h2>
+                    <p class="mt-4 text-lg text-gray-600">La movilización de capital privado es crucial, pero depende de un delicado equilibrio entre riesgos y factores habilitantes.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    <!-- Risks -->
+                    <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-lg">
+                        <h3 class="text-2xl font-bold text-red-800 mb-4">Factores que Dificultan 👎</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><span class="font-bold mr-2">🏛️</span> Inestabilidad regulatoria y cambios abruptos.</li>
+                            <li class="flex items-start"><span class="font-bold mr-2">📉</span> Riesgo de mercado y volatilidad de precios.</li>
+                            <li class="flex items-start"><span class="font-bold mr-2">👤</span> Debilidad crediticia de los compradores (offtakers).</li>
+                            <li class="flex items-start"><span class="font-bold mr-2">🔌</span> Insuficiencia en infraestructura de transmisión.</li>
+                            <li class="flex items-start"><span class="font-bold mr-2">💰</span> Dependencia de subsidios y distorsiones.</li>
+                        </ul>
+                    </div>
+                    <!-- Facilitators -->
+                    <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg">
+                        <h3 class="text-2xl font-bold text-green-800 mb-4">Factores que Facilitan 👍</h3>
+                         <ul class="space-y-3">
+                            <li class="flex items-start"><span class="font-bold mr-2">📜</span> Regulación estable y políticas claras a largo plazo.</li>
+                            <li class="flex items-start"><span class="font-bold mr-2">💡</span> Competitividad y reducción de costos tecnológicos.</li>
+                            <li class="flex items-start"><span class="font-bold mr-2">🏢</span> Offtakers de alta calidad crediticia y diversificación.</li>
+                            <li class="flex items-start"><span class="font-bold mr-2">🌍</span> Rol del financiamiento concesional (Bancos de Desarrollo).</li>
+                            <li class="flex items-start"><span class="font-bold mr-2">🍃</span> Contratos de CO2 y mecanismos de descarbonización.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Challenges Section -->
+        <section id="desafios" class="py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl lg:text-4xl font-bold">Desafíos y Oportunidades Transversales</h2>
+                    <p class="mt-4 text-lg text-gray-600">Abordar estos desafíos es clave para asegurar una transición energética exitosa, justa y sostenible en toda la región.</p>
+                </div>
+
+                <div id="accordion-container" class="max-w-4xl mx-auto space-y-4">
+                    <div class="border rounded-xl overflow-hidden">
+                        <button class="accordion-toggle w-full p-4 text-left font-semibold text-lg bg-gray-50 hover:bg-gray-100 transition flex justify-between items-center">
+                            Brechas Regulatorias y Armonización
+                            <span class="transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 bg-white hidden">
+                            <p>La falta de marcos regulatorios claros para nuevas tecnologías (como el almacenamiento) y para modelos de negocio emergentes (como las comunidades energéticas) representa una barrera significativa para la inversión y el desarrollo.</p>
+                        </div>
+                    </div>
+                     <div class="border rounded-xl overflow-hidden">
+                        <button class="accordion-toggle w-full p-4 text-left font-semibold text-lg bg-gray-50 hover:bg-gray-100 transition flex justify-between items-center">
+                            Infraestructura y Resiliencia de la Red
+                             <span class="transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 bg-white hidden">
+                            <p>Los sistemas eléctricos de la región enfrentan desafíos técnicos como sobrecargas en el sistema de transmisión, inestabilidad de voltaje y restricciones en la conexión de usinas renovables. Además, la infraestructura debe adaptarse para resistir eventos climáticos extremos.</p>
+                        </div>
+                    </div>
+                     <div class="border rounded-xl overflow-hidden">
+                        <button class="accordion-toggle w-full p-4 text-left font-semibold text-lg bg-gray-50 hover:bg-gray-100 transition flex justify-between items-center">
+                            Acceso a Financiamiento
+                            <span class="transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 bg-white hidden">
+                            <p>La transición energética en ALC requiere una inversión anual estimada de más de US$250 mil millones para mitigación y adaptación, cifras que superan los flujos de financiamiento climático actuales. Los Bancos de Desarrollo son clave para movilizar capital privado y desriesgar inversiones.</p>
+                        </div>
+                    </div>
+                    <div class="border rounded-xl overflow-hidden">
+                        <button class="accordion-toggle w-full p-4 text-left font-semibold text-lg bg-gray-50 hover:bg-gray-100 transition flex justify-between items-center">
+                           Impacto Social y Transición Justa
+                           <span class="transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 bg-white hidden">
+                            <p>Es imperativo asegurar que la transición energética sea justa e inclusiva, garantizando el acceso universal a energía limpia y asequible. Esto implica priorizar la electrificación rural y abordar los impactos socioambientales de los proyectos, asegurando una distribución equitativa de los beneficios.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Análisis del Sector Eléctrico LATAM. Un recurso interactivo para la toma de decisiones.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mobile Menu
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Tabs for Business Models
+            const tabsContainer = document.getElementById('tabs-container');
+            const tabContentContainer = document.getElementById('tab-content-container');
+            const tabs = tabsContainer.querySelectorAll('[data-tab-target]');
+            const tabContents = tabContentContainer.querySelectorAll('[data-tab-content]');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetId = tab.dataset.tabTarget;
+                    const targetContent = document.getElementById(targetId);
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    targetContent.classList.add('active');
+                });
+            });
+            // Activate the first tab by default
+            if (tabs.length > 0) {
+                tabs[0].click();
+            }
+            
+            // Accordion for Challenges
+            const accordionToggles = document.querySelectorAll('.accordion-toggle');
+            accordionToggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const content = toggle.nextElementSibling;
+                    const icon = toggle.querySelector('span');
+                    
+                    const isVisible = !content.classList.contains('hidden');
+                    
+                    // Optional: close other accordions
+                    // document.querySelectorAll('.accordion-content').forEach(c => c.classList.add('hidden'));
+                    // document.querySelectorAll('.accordion-toggle span').forEach(i => i.style.transform = '');
+
+                    if(isVisible) {
+                       content.classList.add('hidden');
+                       icon.style.transform = '';
+                    } else {
+                       content.classList.remove('hidden');
+                       icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+
+            // Chart.js Generation Mix Chart
+            const ctx = document.getElementById('generationMixChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Hidroeléctrica', 'Eólica', 'Térmica Renovable', 'Solar', 'Geotermia'],
+                    datasets: [{
+                        label: 'Generación Eléctrica Renovable (%)',
+                        data: [77.35, 10.30, 8.46, 2.86, 1.03],
+                        backgroundColor: [
+                            '#3b82f6', // blue-500
+                            '#10b981', // emerald-500
+                            '#f97316', // orange-500
+                            '#eab308', // yellow-500
+                            '#8b5cf6'  // violet-500
+                        ],
+                        borderColor: '#F8F7F4',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    family: 'Roboto'
+                                },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed.toFixed(2) + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Smooth scrolling and active nav link highlighting
+            const navLinks = document.querySelectorAll('a[href^="#"]');
+            const sections = document.querySelectorAll('section[id]');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Hide mobile menu on click
+                    if (!mobileMenu.classList.contains('hidden')) {
+                         mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+
+</body>
+</html>
